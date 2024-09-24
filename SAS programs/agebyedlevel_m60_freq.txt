@@ -1,0 +1,316 @@
+libname mike 'C:\Users\wardm1\nhanes';
+run;
+
+data m60;
+set mike.nhanes0912_domain2_multimp_m3;
+if edlevel=1 or edlevel=2 then ed=1;
+else if edlevel=3 then ed=3;
+else if edlevel=4 then ed=4;
+else if edlevel=5 then ed=5;
+if age lt 60 then agetwo=0;
+else if age ge 60 and age lt 75 then agetwo=1;
+else if age ge 75 then agetwo=2;
+if smoke_4cat=1 or smoke_4cat=2 then smoke3=1;
+else if smoke_4cat=3 then smoke3=3;
+else if smoke_4cat=4 then smoke3=4;
+if bmi_cat=1 or bmi_cat=2 then bminew=1;
+else if bmi_cat=3 then bminew=3;
+else if bmi_cat=4 then bminew=4;
+run;
+
+
+
+
+proc sort data=m60;
+by _imputation_;
+run;
+
+proc surveyfreq data=m60;
+by _imputation_;
+tables domain_m3*agetwo/row cl;
+stratum stratum;
+weight weight4y;
+cluster psu;
+title 'nhanes0912 men 60+ Multiple imputation';
+ods output crosstabs=m3descriptive;
+run;
+proc print data=m3descriptive;
+run;
+proc sort data=m3descriptive;
+by domain_m3 agetwo _imputation_;
+run;
+proc mianalyze data=m3descriptive;
+by domain_m3 agetwo;
+modeleffects rowpercent;
+stderr rowstderr;
+run;
+
+
+
+
+proc surveyfreq data=m60;
+by _imputation_;
+tables domain_m3*agetwo*ed*smoke3/row cl;
+stratum stratum;
+weight weight4y;
+cluster psu;
+title 'nhanes0912 men 60+ Multiple imputation';
+ods output crosstabs=m3descriptive;
+run;
+proc print data=m3descriptive;
+run;
+proc sort data=m3descriptive;
+by domain_m3 agetwo ed smoke3 _imputation_;
+run;
+proc mianalyze data=m3descriptive;
+by domain_m3 agetwo ed smoke3;
+modeleffects percent;
+stderr stderr;
+run;
+
+
+
+proc surveyfreq data=m60;
+by _imputation_;
+tables domain_m3*agetwo*ed*alcohol_cat/row cl;
+stratum stratum;
+weight weight4y;
+cluster psu;
+title 'nhanes0912 men 60+ Multiple imputation';
+ods output crosstabs=m3descriptive;
+run;
+proc print data=m3descriptive;
+run;
+proc sort data=m3descriptive;
+by domain_m3 agetwo ed alcohol_cat _imputation_;
+run;
+proc mianalyze data=m3descriptive;
+by domain_m3 agetwo ed alcohol_cat;
+modeleffects percent;
+stderr stderr;
+run;
+
+
+
+proc surveyfreq data=m60;
+by _imputation_;
+tables domain_m3*agetwo*ed*ami/row cl;
+stratum stratum;
+weight weight4y;
+cluster psu;
+title 'nhanes0912 men 60+ Multiple imputation';
+ods output crosstabs=m3descriptive;
+run;
+proc print data=m3descriptive;
+run;
+proc sort data=m3descriptive;
+by domain_m3 agetwo ed ami _imputation_;
+run;
+proc mianalyze data=m3descriptive;
+by domain_m3 agetwo ed ami;
+modeleffects percent;
+stderr stderr;
+run;
+
+
+
+proc surveyfreq data=m60;
+by _imputation_;
+tables domain_m3*agetwo*ed*highbp/row cl;
+stratum stratum;
+weight weight4y;
+cluster psu;
+title 'nhanes0912 men 60+ Multiple imputation';
+ods output crosstabs=m3descriptive;
+run;
+proc print data=m3descriptive;
+run;
+proc sort data=m3descriptive;
+by domain_m3 agetwo ed highbp _imputation_;
+run;
+proc mianalyze data=m3descriptive;
+by domain_m3 agetwo ed highbp;
+modeleffects percent;
+stderr stderr;
+run;
+
+
+
+
+proc surveyfreq data=m60;
+by _imputation_;
+tables domain_m3*agetwo*ed*diab/row cl;
+stratum stratum;
+weight weight4y;
+cluster psu;
+title 'nhanes0912 men 60+ Multiple imputation';
+ods output crosstabs=m3descriptive;
+run;
+proc print data=m3descriptive;
+run;
+proc sort data=m3descriptive;
+by domain_m3 agetwo ed diab _imputation_;
+run;
+proc mianalyze data=m3descriptive;
+by domain_m3 agetwo ed diab;
+modeleffects percent;
+stderr stderr;
+run;
+
+
+
+proc surveyfreq data=m60;
+by _imputation_;
+tables domain_m3*agetwo*ed*chf/row cl;
+stratum stratum;
+weight weight4y;
+cluster psu;
+title 'nhanes0912 men 60+ Multiple imputation';
+ods output crosstabs=m3descriptive;
+run;
+proc print data=m3descriptive;
+run;
+proc sort data=m3descriptive;
+by domain_m3 agetwo ed chf _imputation_;
+run;
+proc mianalyze data=m3descriptive;
+by domain_m3 agetwo ed chf;
+modeleffects percent;
+stderr stderr;
+run;
+
+
+
+proc surveyfreq data=m60;
+by _imputation_;
+tables domain_m3*agetwo*ed*cva/row cl;
+stratum stratum;
+weight weight4y;
+cluster psu;
+title 'nhanes0912 men 60+ Multiple imputation';
+ods output crosstabs=m3descriptive;
+run;
+proc print data=m3descriptive;
+run;
+proc sort data=m3descriptive;
+by domain_m3 agetwo ed cva _imputation_;
+run;
+proc mianalyze data=m3descriptive;
+by domain_m3 agetwo ed cva;
+modeleffects percent;
+stderr stderr;
+run;
+
+
+
+
+proc surveyfreq data=m60;
+by _imputation_;
+tables domain_m3*agetwo*ed*ckd/row cl;
+stratum stratum;
+weight weight4y;
+cluster psu;
+title 'nhanes0912 men 60+ Multiple imputation';
+ods output crosstabs=m3descriptive;
+run;
+proc print data=m3descriptive;
+run;
+proc sort data=m3descriptive;
+by domain_m3 agetwo ed ckd _imputation_;
+run;
+proc mianalyze data=m3descriptive;
+by domain_m3 agetwo ed ckd;
+modeleffects percent;
+stderr stderr;
+run;
+
+
+
+proc surveyfreq data=m60;
+by _imputation_;
+tables domain_m3*agetwo*ed*copd/row cl;
+stratum stratum;
+weight weight4y;
+cluster psu;
+title 'nhanes0912 men 60+ Multiple imputation';
+ods output crosstabs=m3descriptive;
+run;
+proc print data=m3descriptive;
+run;
+proc sort data=m3descriptive;
+by domain_m3 agetwo ed copd _imputation_;
+run;
+proc mianalyze data=m3descriptive;
+by domain_m3 agetwo ed copd;
+modeleffects percent;
+stderr stderr;
+run;
+
+
+
+
+proc surveyfreq data=m60;
+by _imputation_;
+tables domain_m3*agetwo*ed*cancer/row cl;
+stratum stratum;
+weight weight4y;
+cluster psu;
+title 'nhanes0912 men 60+ Multiple imputation';
+ods output crosstabs=m3descriptive;
+run;
+proc print data=m3descriptive;
+run;
+proc sort data=m3descriptive;
+by domain_m3 agetwo ed cancer _imputation_;
+run;
+proc mianalyze data=m3descriptive;
+by domain_m3 agetwo ed cancer;
+modeleffects percent;
+stderr stderr;
+run;
+
+
+
+
+proc surveyfreq data=m60;
+by _imputation_;
+tables domain_m3*agetwo*ed*waist_cat/row cl;
+stratum stratum;
+weight weight4y;
+cluster psu;
+title 'nhanes0912 men 60+ Multiple imputation';
+ods output crosstabs=m3descriptive;
+run;
+proc print data=m3descriptive;
+run;
+proc sort data=m3descriptive;
+by domain_m3 agetwo ed waist_cat _imputation_;
+run;
+proc mianalyze data=m3descriptive;
+by domain_m3 agetwo ed waist_cat;
+modeleffects percent;
+stderr stderr;
+run;
+
+
+
+
+proc surveyfreq data=m60;
+by _imputation_;
+tables domain_m3*agetwo*ed*bminew/row cl;
+stratum stratum;
+weight weight4y;
+cluster psu;
+title 'nhanes0912 men 60+ Multiple imputation';
+ods output crosstabs=m3descriptive;
+run;
+proc print data=m3descriptive;
+run;
+proc sort data=m3descriptive;
+by domain_m3 agetwo ed bminew _imputation_;
+run;
+proc mianalyze data=m3descriptive;
+by domain_m3 agetwo ed bminew;
+modeleffects percent;
+stderr stderr;
+run;
