@@ -26,5 +26,5 @@ SAS Program files and work flow
 4.  agebyedlevel_m60_freq.txt and agebyedlevel_f60_freq.txt		(2 files) provide disease frequencies in NHANES 2009-2012 in men and women, for use as sampling frequencies in NHANES III
 5.  prevalence_m60_ami_multimp2.txt to prevalence_f60_waist_multimp2.txt	(24 files)  create 500 random samples of NHANES III participants (by sex) having same prevalence of corresponding disease as in NHANES 2009-2012, computes 500 adjusted odds ratios for education level
 6.  cox_m60_bmi_multimp2.txt to cox_f60_multimp2.txt   (24 files)  computes adjusted hazard ratios for education level on above generated 500 random samples per disease and sex group
-7.  m3_f3_or_interactions_n0912.txt		logistic models testing effect modification by disease between NHANES III and NHANES 2009-2012
-8.  m3_f3_hr_interactions_n0912.txt		Cox models testing effect modification by disease between NHANES III and NHANES 2009-2012 
+7.  m3_f3_or_interactions_n0912_new.txt		logistic models testing effect modification by disease between NHANES III and NHANES 2009-2012 (_new are updated files)
+8.  m3_f3_hr_interactions_n0912_new.txt		Cox models testing effect modification by disease between NHANES III and NHANES 2009-2012 (_new are updated files) 
