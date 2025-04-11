@@ -1,0 +1,3583 @@
+libname mike 'C:\Users\wardm1\nhanes';
+run;
+
+/* N0912 subsets by comorbidity */
+/*MEN */
+/* Omitting current smokers */
+
+data mod0912;
+set mike.nhanes0912_domain2_multimp_m3;
+agedur=age+(dur2/12);
+run;
+
+
+data htn;
+set mod0912;
+if domain_m3=1 and highbp=1 and (smoke_4cat=3 or smoke_4cat=4) then domain_bp=1;
+else if (domain_m3=1 and highbp=0) or (domain_m3=1 and smoke_4cat=1) or (domain_m3=1
+and smoke_4cat=2) or domain_m3=0 then domain_bp=0;
+run;
+
+
+proc sort data=htn;
+by _imputation_;
+run;
+proc surveyphreg data=htn;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat ami diab cva chf ckd copd cancer
+bmi_cat /entry=age;
+stratum stratum;
+cluster psu;
+weight weight4y;
+domain domain_bp;
+by _imputation_;
+ods output parameterestimates=parms111;
+run;
+data parmsclass111;
+set parms111;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass111;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass111;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_cox_111;
+run;
+data m3_cox_111a;
+set m3_cox_111;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_cox_111a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+
+data w31;
+set htn;
+where _imputation_=1;
+run;
+proc freq data=w31;
+tables domain_bp*edlevel;
+run;
+
+
+
+
+
+
+
+data nohtn;
+set mod0912;
+if domain_m3=1 and highbp=0 and (smoke_4cat=3 or smoke_4cat=4) then domain_bp=1;
+else if (domain_m3=1 and highbp=1) or (domain_m3=1 and smoke_4cat=1) or (domain_m3=1
+and smoke_4cat=2) or domain_m3=0 then domain_bp=0;
+run;
+
+
+proc sort data=nohtn;
+by _imputation_;
+run;
+proc surveyphreg data=nohtn;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat ami diab cva chf ckd copd cancer
+bmi_cat /entry=age;
+stratum stratum;
+cluster psu;
+weight weight4y;
+domain domain_bp;
+by _imputation_;
+ods output parameterestimates=parms112;
+run;
+data parmsclass112;
+set parms112;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass112;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass112;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_cox_112;
+run;
+data m3_cox_112a;
+set m3_cox_112;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_cox_112a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+data w30;
+set nohtn;
+where _imputation_=1;
+run;
+proc freq data=w30;
+tables domain_bp*edlevel;
+run;
+
+
+
+
+
+
+
+
+
+data ami;
+set mod0912;
+if domain_m3=1 and ami=1 and (smoke_4cat=3 or smoke_4cat=4) then domain_mi=1;
+else if (domain_m3=1 and ami=0) or (domain_m3=1 and smoke_4cat=1) or (domain_m3=1
+and smoke_4cat=2) or domain_m3=0 then domain_mi=0;
+run;
+
+
+proc sort data=ami;
+by _imputation_;
+run;
+proc surveyphreg data=ami;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat highbp diab cva chf ckd copd cancer
+bmi_cat /entry=age;
+stratum stratum;
+cluster psu;
+weight weight4y;
+domain domain_mi;
+by _imputation_;
+ods output parameterestimates=parms113;
+run;
+data parmsclass113;
+set parms113;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass113;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass113;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_cox_113;
+run;
+data m3_cox_113a;
+set m3_cox_113;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_cox_113a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+
+data w29;
+set ami;
+where _imputation_=1;
+run;
+proc freq data=w29;
+tables domain_mi*edlevel;
+run;
+
+
+
+
+
+
+
+data noami;
+set mod0912;
+if domain_m3=1 and ami=0 and (smoke_4cat=3 or smoke_4cat=4) then domain_mi=1;
+else if (domain_m3=1 and ami=1) or (smoke_4cat=1 or smoke_4cat=2)
+or domain_m3=0 then domain_mi=0;
+run;
+
+
+proc sort data=noami;
+by _imputation_;
+run;
+proc surveyphreg data=noami;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat highbp diab cva chf ckd copd cancer
+bmi_cat /entry=age;
+stratum stratum;
+cluster psu;
+weight weight4y;
+domain domain_mi;
+by _imputation_;
+ods output parameterestimates=parms114;
+run;
+data parmsclass114;
+set parms114;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass114;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass114;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_cox_114;
+run;
+data m3_cox_114a;
+set m3_cox_114;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_cox_114a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+
+
+data w28;
+set noami;
+where _imputation_=1;
+run;
+proc freq data=w28;
+tables domain_mi*edlevel;
+run;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+data cva;
+set mod0912;
+if domain_m3=1 and cva=1 and (smoke_4cat=3 or smoke_4cat=4) then domain_cva=1;
+else if (domain_m3=1 and cva=0) or (smoke_4cat=1 or smoke_4cat=2) or domain_m3=0 then domain_cva=0;
+run;
+
+
+proc sort data=cva;
+by _imputation_;
+run;
+proc surveyphreg data=cva;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat highbp diab ami chf ckd copd cancer
+bmi_cat /entry=age;
+stratum stratum;
+cluster psu;
+weight weight4y;
+domain domain_cva;
+by _imputation_;
+ods output parameterestimates=parms114;
+run;
+data parmsclass114;
+set parms114;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass114;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass114;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_cox_114;
+run;
+data m3_cox_114a;
+set m3_cox_114;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_cox_114a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+
+data w27;
+set cva;
+where _imputation_=1;
+run;
+proc freq data=w27;
+tables domain_cva*edlevel;
+run;
+
+
+
+data nocva;
+set mod0912;
+if domain_m3=1 and cva=0 and (smoke_4cat=3 or smoke_4cat=4) then domain_cva=1;
+else if (domain_m3=1 and cva=1) or (smoke_4cat=1) or (smoke_4cat=2) or domain_m3=0 then domain_cva=0;
+run;
+
+
+proc sort data=nocva;
+by _imputation_;
+run;
+proc surveyphreg data=nocva;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat highbp diab ami chf ckd copd cancer
+bmi_cat /entry=age;
+stratum stratum;
+cluster psu;
+weight weight4y;
+domain domain_cva;
+by _imputation_;
+ods output parameterestimates=parms115;
+run;
+data parmsclass115;
+set parms115;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass115;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass115;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_cox_115;
+run;
+data m3_cox_115a;
+set m3_cox_115;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_cox_115a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+
+data w26;
+set nocva;
+where _imputation_=1;
+run;
+proc freq data=w26;
+tables domain_cva*edlevel;
+run;
+
+
+
+
+
+
+
+data ckd;
+set mod0912;
+if domain_m3=1 and ckd=1 and (smoke_4cat=3 or smoke_4cat=4) then domain_ckd=1;
+else if (domain_m3=1 and ckd=0) or (smoke_4cat=1) or (smoke_4cat=2) 
+or domain_m3=0 then domain_ckd=0;
+run;
+
+
+proc sort data=ckd;
+by _imputation_;
+run;
+proc surveyphreg data=ckd;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat highbp diab ami chf cva copd cancer
+bmi_cat /entry=age;
+stratum stratum;
+cluster psu;
+weight weight4y;
+domain domain_ckd;
+by _imputation_;
+ods output parameterestimates=parms116;
+run;
+data parmsclass116;
+set parms116;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass116;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass116;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_cox_116;
+run;
+data m3_cox_116a;
+set m3_cox_116;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_cox_116a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+data w25;
+set ckd;
+where _imputation_=1;
+run;
+proc freq data=w25;
+tables domain_ckd*edlevel;
+run;
+
+
+
+
+data nockd;
+set mod0912;
+if domain_m3=1 and ckd=0 and (smoke_4cat=3 or smoke_4cat=4) then domain_ckd=1;
+else if (domain_m3=1 and ckd=1) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_ckd=0;
+run;
+
+
+proc sort data=nockd;
+by _imputation_;
+run;
+proc surveyphreg data=nockd;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat highbp diab ami chf cva copd cancer
+bmi_cat /entry=age;
+stratum stratum;
+cluster psu;
+weight weight4y;
+domain domain_ckd;
+by _imputation_;
+ods output parameterestimates=parms117;
+run;
+data parmsclass117;
+set parms117;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass117;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass117;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_cox_117;
+run;
+data m3_cox_117a;
+set m3_cox_117;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_cox_117a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+data w24;
+set nockd;
+where _imputation_=1;
+run;
+proc freq data=w24;
+tables domain_ckd*edlevel;
+run;
+
+
+
+
+
+
+data chf;
+set mod0912;
+if domain_m3=1 and chf=1 and (smoke_4cat=3 or smoke_4cat=4) then domain_chf=1;
+else if (domain_m3=1 and chf=0) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_chf=0;
+run;
+
+
+proc sort data=chf;
+by _imputation_;
+run;
+proc surveyphreg data=chf;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat highbp diab ami ckd cva copd cancer
+bmi_cat /entry=age;
+stratum stratum;
+cluster psu;
+weight weight4y;
+domain domain_chf;
+by _imputation_;
+ods output parameterestimates=parms118;
+run;
+data parmsclass118;
+set parms118;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass118;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass118;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_cox_118;
+run;
+data m3_cox_118a;
+set m3_cox_118;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_cox_118a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+data w23;
+set chf;
+where _imputation_=1;
+run;
+proc freq data=w23;
+tables domain_chf*edlevel;
+run;
+
+
+
+
+
+
+data nochf;
+set mod0912;
+if domain_m3=1 and chf=0 and (smoke_4cat=3 or smoke_4cat=4) then domain_chf=1;
+else if (domain_m3=1 and chf=1) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_chf=0;
+run;
+
+
+proc sort data=nochf;
+by _imputation_;
+run;
+proc surveyphreg data=nochf;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat highbp diab ami ckd cva copd cancer
+bmi_cat /entry=age;
+stratum stratum;
+cluster psu;
+weight weight4y;
+domain domain_chf;
+by _imputation_;
+ods output parameterestimates=parms119;
+run;
+data parmsclass119;
+set parms119;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass119;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass119;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_cox_119;
+run;
+data m3_cox_119a;
+set m3_cox_119;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_cox_119a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+data w22;
+set nochf;
+where _imputation_=1;
+run;
+proc freq data=w22;
+tables domain_chf*edlevel;
+run;
+
+
+
+
+
+data copd;
+set mod0912;
+if domain_m3=1 and copd=1 and (smoke_4cat=3 or smoke_4cat=4) then domain_copd=1;
+else if (domain_m3=1 and copd=0) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_copd=0;
+run;
+
+
+proc sort data=copd;
+by _imputation_;
+run;
+proc surveyphreg data=copd;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat highbp diab ami ckd cva chf cancer
+bmi_cat /entry=age;
+stratum stratum;
+cluster psu;
+weight weight4y;
+domain domain_copd;
+by _imputation_;
+ods output parameterestimates=parms120;
+run;
+data parmsclass120;
+set parms120;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass120;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass120;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_cox_120;
+run;
+data m3_cox_120a;
+set m3_cox_120;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_cox_120a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+data w21;
+set copd;
+where _imputation_=1;
+run;
+proc freq data=w21;
+tables domain_copd*edlevel;
+run;
+
+
+
+
+
+data nocopd;
+set mod0912;
+if domain_m3=1 and copd=0 and (smoke_4cat=3 or smoke_4cat=4) then domain_copd=1;
+else if (domain_m3=1 and copd=1) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_copd=0;
+run;
+
+
+proc sort data=nocopd;
+by _imputation_;
+run;
+proc surveyphreg data=nocopd;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat highbp diab ami ckd cva chf cancer
+bmi_cat /entry=age;
+stratum stratum;
+cluster psu;
+weight weight4y;
+domain domain_copd;
+by _imputation_;
+ods output parameterestimates=parms121;
+run;
+data parmsclass121;
+set parms121;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass121;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass121;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_cox_121;
+run;
+data m3_cox_121a;
+set m3_cox_121;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_cox_121a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+data w20;
+set nocopd;
+where _imputation_=1;
+run;
+proc freq data=w20;
+tables domain_copd*edlevel;
+run;
+
+
+
+
+data cancer;
+set mod0912;
+if domain_m3=1 and cancer=1 and (smoke_4cat=3 or smoke_4cat=4) then domain_cancer=1;
+else if (domain_m3=1 and cancer=0) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_cancer=0;
+run;
+
+
+proc sort data=cancer;
+by _imputation_;
+run;
+proc surveyphreg data=cancer;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat highbp diab ami ckd cva chf copd
+bmi_cat /entry=age;
+stratum stratum;
+cluster psu;
+weight weight4y;
+domain domain_cancer;
+by _imputation_;
+ods output parameterestimates=parms122;
+run;
+data parmsclass122;
+set parms122;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass122;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass122;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_cox_122;
+run;
+data m3_cox_122a;
+set m3_cox_122;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_cox_122a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+data w19;
+set cancer;
+where _imputation_=1;
+run;
+proc freq data=w19;
+tables domain_cancer*edlevel;
+run;
+
+
+
+
+data nocancer;
+set mod0912;
+if domain_m3=1 and cancer=0 and (smoke_4cat=3 or smoke_4cat=4) then domain_cancer=1;
+else if (domain_m3=1 and cancer=1) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_cancer=0;
+run;
+
+
+proc sort data=nocancer;
+by _imputation_;
+run;
+proc surveyphreg data=nocancer;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat highbp diab ami ckd cva chf copd
+bmi_cat /entry=age;
+stratum stratum;
+cluster psu;
+weight weight4y;
+domain domain_cancer;
+by _imputation_;
+ods output parameterestimates=parms123;
+run;
+data parmsclass123;
+set parms123;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass123;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass123;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_cox_123;
+run;
+data m3_cox_123a;
+set m3_cox_123;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_cox_123a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+data w18;
+set nocancer;
+where _imputation_=1;
+run;
+proc freq data=w18;
+tables domain_cancer*edlevel;
+run;
+
+
+
+
+
+
+
+
+data diab;
+set mod0912;
+if domain_m3=1 and diab=1 and (smoke_4cat=3 or smoke_4cat=4) then domain_diab=1;
+else if (domain_m3=1 and diab=0) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_diab=0;
+run;
+
+
+proc sort data=diab;
+by _imputation_;
+run;
+proc surveyphreg data=diab;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat highbp cancer ami ckd cva chf copd
+bmi_cat /entry=age;
+stratum stratum;
+cluster psu;
+weight weight4y;
+domain domain_diab;
+by _imputation_;
+ods output parameterestimates=parms124;
+run;
+data parmsclass124;
+set parms124;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass124;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass124;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_cox_124;
+run;
+data m3_cox_124a;
+set m3_cox_124;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_cox_124a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+data w17;
+set diab;
+where _imputation_=1;
+run;
+proc freq data=w17;
+tables domain_diab*edlevel;
+run;
+
+
+
+
+
+
+
+data nodiab;
+set mod0912;
+if domain_m3=1 and diab=0 and (smoke_4cat=3 or smoke_4cat=4) then domain_diab=1;
+else if (domain_m3=1 and diab=1) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_diab=0;
+run;
+
+
+proc sort data=nodiab;
+by _imputation_;
+run;
+proc surveyphreg data=nodiab;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat highbp cancer ami ckd cva chf copd
+bmi_cat /entry=age;
+stratum stratum;
+cluster psu;
+weight weight4y;
+domain domain_diab;
+by _imputation_;
+ods output parameterestimates=parms125;
+run;
+data parmsclass125;
+set parms125;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass125;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass125;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_cox_125;
+run;
+data m3_cox_125a;
+set m3_cox_125;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_cox_125a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+data w16;
+set nodiab;
+where _imputation_=1;
+run;
+proc freq data=w16;
+tables domain_diab*edlevel;
+run;
+
+
+
+
+
+data drink2;
+set mod0912;
+if domain_m3=1 and alcohol_cat=2 and (smoke_4cat=3 or smoke_4cat=4) then domain_drink=1;
+else if (domain_m3=1 and (alcohol_cat=0 or alcohol_cat=1)) or smoke_4cat=1
+or smoke_4cat=2 or domain_m3=0 then domain_drink=0;
+run;
+
+
+proc sort data=drink2;
+by _imputation_;
+run;
+proc surveyphreg data=drink2;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel smoke_4cat diab highbp cancer ami ckd cva chf copd
+bmi_cat /entry=age;
+stratum stratum;
+cluster psu;
+weight weight4y;
+domain domain_drink;
+by _imputation_;
+ods output parameterestimates=parms128;
+run;
+data parmsclass128;
+set parms128;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass128;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass128;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_cox_128;
+run;
+data m3_cox_128a;
+set m3_cox_128;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_cox_128a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+
+
+
+
+data drink1;
+set mod0912;
+if domain_m3=1 and alcohol_cat=1 and (smoke_4cat=3 or smoke_4cat=4) then domain_drink=1;
+else if (domain_m3=1 and (alcohol_cat=0 or alcohol_cat=2)) or smoke_4cat=1
+or smoke_4cat=2 or domain_m3=0 then domain_drink=0;
+run;
+
+
+proc sort data=drink1;
+by _imputation_;
+run;
+proc surveyphreg data=drink1;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel smoke_4cat diab highbp cancer ami ckd cva chf copd
+bmi_cat /entry=age;
+stratum stratum;
+cluster psu;
+weight weight4y;
+domain domain_drink;
+by _imputation_;
+ods output parameterestimates=parms128;
+run;
+data parmsclass128;
+set parms128;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass128;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass128;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_cox_128;
+run;
+data m3_cox_128a;
+set m3_cox_128;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_cox_128a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+
+
+
+data drink12;
+set mod0912;
+if domain_m3=1 and (alcohol_cat=1 or alcohol_cat=2) and (smoke_4cat=3 or smoke_4cat=4) then domain_drink=1;
+else if (domain_m3=1 and alcohol_cat=0) or smoke_4cat=1
+or smoke_4cat=2 or domain_m3=0 then domain_drink=0;
+run;
+
+
+proc sort data=drink12;
+by _imputation_;
+run;
+proc surveyphreg data=drink12;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel smoke_4cat diab highbp cancer ami ckd cva chf copd
+bmi_cat /entry=age;
+stratum stratum;
+cluster psu;
+weight weight4y;
+domain domain_drink;
+by _imputation_;
+ods output parameterestimates=parms128;
+run;
+data parmsclass128;
+set parms128;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass128;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass128;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_cox_128;
+run;
+data m3_cox_128a;
+set m3_cox_128;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_cox_128a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+data w15;
+set drink12;
+where _imputation_=1;
+run;
+proc freq data=w15;
+tables domain_drink*edlevel;
+run;
+
+
+
+data nodrink;
+set mod0912;
+if domain_m3=1 and alcohol_cat=0 and (smoke_4cat=3 or smoke_4cat=4) then domain_nodrink=1;
+else if (domain_m3=1 and (alcohol_cat=1 or alcohol_cat=2)) or smoke_4cat=1 or smoke_4cat=2
+or domain_m3=0 then domain_nodrink=0;
+run;
+
+
+proc sort data=nodrink;
+by _imputation_;
+run;
+proc surveyphreg data=nodrink;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel smoke_4cat diab highbp cancer ami ckd cva chf copd
+bmi_cat /entry=age;
+stratum stratum;
+cluster psu;
+weight weight4y;
+domain domain_nodrink;
+by _imputation_;
+ods output parameterestimates=parms129;
+run;
+data parmsclass129;
+set parms129;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass129;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass129;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_cox_129;
+run;
+data m3_cox_129a;
+set m3_cox_129;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_cox_129a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+
+data w15;
+set nodrink;
+where _imputation_=1;
+run;
+proc freq data=w15;
+tables domain_nodrink*edlevel;
+run;
+
+
+
+
+
+
+
+data waist;
+set mod0912;
+if domain_m3=1 and waist_cat=1 and (smoke_4cat=3 or smoke_4cat=4) then domain_waist=1;
+else if (domain_m3=1 and waist=0) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_waist=0;
+run;
+
+
+proc sort data=waist;
+by _imputation_;
+run;
+proc surveyphreg data=waist;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel smoke_4cat alcohol_cat diab highbp cancer ami ckd cva chf copd
+/entry=age;
+stratum stratum;
+cluster psu;
+weight weight4y;
+domain domain_waist;
+by _imputation_;
+ods output parameterestimates=parms130;
+run;
+data parmsclass130;
+set parms130;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass130;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass130;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_cox_130;
+run;
+data m3_cox_130a;
+set m3_cox_130;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_cox_130a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+data w14;
+set waist;
+where _imputation_=1;
+run;
+proc freq data=w14;
+tables domain_waist*edlevel;
+run;
+
+
+
+
+
+
+
+
+data nowaist;
+set mod0912;
+if domain_m3=1 and waist_cat=0 and (smoke_4cat=3 or smoke_4cat=4) then domain_nowaist=1;
+else if (domain_m3=1 and waist_cat=1) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_nowaist=0;
+run;
+
+
+proc sort data=nowaist;
+by _imputation_;
+run;
+proc surveyphreg data=nowaist;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel smoke_4cat alcohol_cat diab highbp cancer ami ckd cva chf copd
+/entry=age;
+stratum stratum;
+cluster psu;
+weight weight4y;
+domain domain_nowaist;
+by _imputation_;
+ods output parameterestimates=parms131;
+run;
+data parmsclass131;
+set parms131;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass131;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass131;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_cox_131;
+run;
+data m3_cox_131a;
+set m3_cox_131;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_cox_131a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+data w13;
+set nowaist;
+where _imputation_=1;
+run;
+proc freq data=w13;
+tables domain_nowaist*edlevel;
+run;
+
+
+
+
+
+
+
+data who;
+set mod0912;
+if domain_m3=1 and bmi_cat=4 and (smoke_4cat=3 or smoke_4cat=4)then domain_who=1;
+else if (domain_m3=1 and (bmi_cat=1 or bmi_cat=2 or bmi_cat=3)) or smoke_4cat=1 
+or smoke_4cat=2 or domain_m3=0 then domain_who=0;
+run;
+
+
+proc sort data=who;
+by _imputation_;
+run;
+proc surveyphreg data=who;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel smoke_4cat alcohol_cat diab highbp cancer ami ckd cva chf copd
+/entry=age;
+stratum stratum;
+cluster psu;
+weight weight4y;
+domain domain_who;
+by _imputation_;
+ods output parameterestimates=parms132;
+run;
+data parmsclass132;
+set parms132;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass132;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass132;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_cox_132;
+run;
+data m3_cox_132a;
+set m3_cox_132;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_cox_132a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+data w12;
+set who;
+where _imputation_=1;
+run;
+proc freq data=w12;
+tables domain_who*edlevel;
+run;
+
+
+
+
+data nowho;
+set mod0912;
+if domain_m3=1 and (bmi_cat=1 or bmi_cat=2 or bmi_cat=3) and (smoke_4cat=3 
+or smoke_4cat=4) then domain_nowho=1;
+else if (domain_m3=1 and bmi_cat=4) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_nowho=0;
+run;
+
+
+proc sort data=nowho;
+by _imputation_;
+run;
+proc surveyphreg data=nowho;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel smoke_4cat alcohol_cat diab highbp cancer ami ckd cva chf copd
+/entry=age;
+stratum stratum;
+cluster psu;
+weight weight4y;
+domain domain_nowho;
+by _imputation_;
+ods output parameterestimates=parms133;
+run;
+data parmsclass133;
+set parms133;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass133;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass133;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_cox_133;
+run;
+data m3_cox_133a;
+set m3_cox_133;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_cox_133a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+data w1;
+set nowho;
+where _imputation_=1;
+run;
+proc freq data=w1;
+tables domain_nowho*edlevel;
+run;
+
+
+
+
+
+
+
+
+
+
+
+
+/* N3 subsets by comorbidity */
+
+
+
+data mod3;
+set mike.nhanes3_domain3_multimp_m3;
+agedur=age+(dur2/12);
+run;
+
+
+data htn;
+set mod3;
+if domain_m3=1 and highbp=1 and (smoke_4cat=3 or smoke_4cat=4) then domain_bp=1;
+else if (domain_m3=1 and highbp=0) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_bp=0;
+run;
+
+
+proc sort data=htn;
+by _imputation_;
+run;
+proc surveyphreg data=htn;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat ami diab cva chf ckd copd cancer
+bmi_cat /entry=age;
+stratum stratum6;
+cluster psu6;
+weight wtpfex6;
+domain domain_bp;
+by _imputation_;
+ods output parameterestimates=parms111;
+run;
+data parmsclass111;
+set parms111;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass111;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass111;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_coxh_111;
+run;
+data m3_coxh_111a;
+set m3_coxh_111;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_coxh_111a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+data fte4;
+set htn;
+where _imputation_=1;
+run;
+proc freq data=fte4;
+tables domain_bp*edlevel;
+run;
+
+
+
+
+
+
+data nohtn;
+set mod3;
+if domain_m3=1 and highbp=0 and (smoke_4cat=3 or smoke_4cat=4) then domain_bp=1;
+else if (domain_m3=1 and highbp=1) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_bp=0;
+run;
+
+
+proc sort data=nohtn;
+by _imputation_;
+run;
+proc surveyphreg data=nohtn;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat ami diab cva chf ckd copd cancer
+bmi_cat /entry=age;
+stratum stratum6;
+cluster psu6;
+weight wtpfex6;
+domain domain_bp;
+by _imputation_;
+ods output parameterestimates=parms112;
+run;
+data parmsclass112;
+set parms112;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass112;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass112;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_coxh_112;
+run;
+data m3_coxh_112a;
+set m3_coxh_112;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_coxh_112a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+data fte3;
+set nohtn;
+where _imputation_=1;
+run;
+proc freq data=fte3;
+tables domain_bp*edlevel;
+run;
+
+
+
+
+data ami;
+set mod3;
+if domain_m3=1 and ami=1 and (smoke_4cat=3 or smoke_4cat=4) then domain_mi=1;
+else if (domain_m3=1 and ami=0) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_mi=0;
+run;
+
+
+proc sort data=ami;
+by _imputation_;
+run;
+proc surveyphreg data=ami;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat highbp diab cva chf ckd copd cancer
+bmi_cat /entry=age;
+stratum stratum6;
+cluster psu6;
+weight wtpfex6;
+domain domain_mi;
+by _imputation_;
+ods output parameterestimates=parms113;
+run;
+data parmsclass113;
+set parms113;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass113;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass113;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_coxh_113;
+run;
+data m3_coxh_113a;
+set m3_coxh_113;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_coxh_113a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+data fte2;
+set ami;
+where _imputation_=1;
+run;
+proc freq data=fte2;
+tables domain_mi*edlevel;
+run;
+
+
+
+data noami;
+set mod3;
+if domain_m3=1 and ami=0 and (smoke_4cat=3 or smoke_4cat=4) then domain_mi=1;
+else if (domain_m3=1 and ami=1) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_mi=0;
+run;
+
+
+proc sort data=noami;
+by _imputation_;
+run;
+proc surveyphreg data=noami;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat highbp diab cva chf ckd copd cancer
+bmi_cat /entry=age;
+stratum stratum6;
+cluster psu6;
+weight wtpfex6;
+domain domain_mi;
+by _imputation_;
+ods output parameterestimates=parms114;
+run;
+data parmsclass114;
+set parms114;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass114;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass114;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_coxh_114;
+run;
+data m3_coxh_114a;
+set m3_coxh_114;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_coxh_114a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+data fte;
+set noami;
+where _imputation_=1;
+run;
+proc freq data=fte;
+tables domain_mi*edlevel;
+run;
+
+
+
+
+
+
+data cva;
+set mod3;
+if domain_m3=1 and cva=1 and (smoke_4cat=3 or smoke_4cat=4) then domain_cva=1;
+else if (domain_m3=1 and cva=0) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_cva=0;
+run;
+
+
+proc sort data=cva;
+by _imputation_;
+run;
+proc surveyphreg data=cva;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat highbp diab ami chf ckd copd cancer
+bmi_cat /entry=age;
+stratum stratum6;
+cluster psu6;
+weight wtpfex6;
+domain domain_cva;
+by _imputation_;
+ods output parameterestimates=parms114;
+run;
+data parmsclass114;
+set parms114;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass114;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass114;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_coxh_114;
+run;
+data m3_coxh_114a;
+set m3_coxh_114;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_coxh_114a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+data thirtee;
+set cva;
+where _imputation_=1;
+run;
+proc freq data=thirtee;
+tables domain_cva*edlevel;
+run;
+
+
+
+
+
+
+data nocva;
+set mod3;
+if domain_m3=1 and cva=0 and (smoke_4cat=3 or smoke_4cat=4) then domain_cva=1;
+else if (domain_m3=1 and cva=1) or domain_m3=0 then domain_cva=0;
+run;
+
+
+proc sort data=nocva;
+by _imputation_;
+run;
+proc surveyphreg data=nocva;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat highbp diab ami chf ckd copd cancer
+bmi_cat /entry=age;
+stratum stratum6;
+cluster psu6;
+weight wtpfex6;
+domain domain_cva;
+by _imputation_;
+ods output parameterestimates=parms115;
+run;
+data parmsclass115;
+set parms115;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass115;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass115;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_coxh_115;
+run;
+data m3_coxh_115a;
+set m3_coxh_115;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_coxh_115a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+data thirte;
+set nocva;
+where _imputation_=1;
+run;
+proc freq data=thirte;
+tables domain_cva*edlevel;
+run;
+
+
+
+
+
+
+data ckd;
+set mod3;
+if domain_m3=1 and ckd=1 and (smoke_4cat=3 or smoke_4cat=4) then domain_ckd=1;
+else if (domain_m3=1 and ckd=0) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_ckd=0;
+run;
+
+
+proc sort data=ckd;
+by _imputation_;
+run;
+proc surveyphreg data=ckd;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat highbp diab ami chf cva copd cancer
+bmi_cat /entry=age;
+stratum stratum6;
+cluster psu6;
+weight wtpfex6;
+domain domain_ckd;
+by _imputation_;
+ods output parameterestimates=parms116;
+run;
+data parmsclass116;
+set parms116;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass116;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass116;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_coxh_116;
+run;
+data m3_coxh_116a;
+set m3_coxh_116;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_coxh_116a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+data thirt;
+set ckd;
+where _imputation_=1;
+run;
+proc freq data=thirt;
+tables domain_ckd*edlevel;
+run;
+
+
+
+
+
+
+data nockd;
+set mod3;
+if domain_m3=1 and ckd=0 and (smoke_4cat=3 or smoke_4cat=4) then domain_ckd=1;
+else if (domain_m3=1 and ckd=1) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_ckd=0;
+run;
+
+
+proc sort data=nockd;
+by _imputation_;
+run;
+proc surveyphreg data=nockd;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat highbp diab ami chf cva copd cancer
+bmi_cat /entry=age;
+stratum stratum6;
+cluster psu6;
+weight wtpfex6;
+domain domain_ckd;
+by _imputation_;
+ods output parameterestimates=parms117;
+run;
+data parmsclass117;
+set parms117;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass117;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass117;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_coxh_117;
+run;
+data m3_coxh_117a;
+set m3_coxh_117;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_coxh_117a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+data thir;
+set nockd;
+where _imputation_=1;
+run;
+proc freq data=thir;
+tables domain_ckd*edlevel;
+run;
+
+
+
+
+
+data chf;
+set mod3;
+if domain_m3=1 and chf=1 and (smoke_4cat=3 or smoke_4cat=4) then domain_chf=1;
+else if (domain_m3=1 and chf=0) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_chf=0;
+run;
+
+
+proc sort data=chf;
+by _imputation_;
+run;
+proc surveyphreg data=chf;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat highbp diab ami ckd cva copd cancer
+bmi_cat /entry=age;
+stratum stratum6;
+cluster psu6;
+weight wtpfex6;
+domain domain_chf;
+by _imputation_;
+ods output parameterestimates=parms118;
+run;
+data parmsclass118;
+set parms118;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass118;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass118;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_coxh_118;
+run;
+data m3_coxh_118a;
+set m3_coxh_118;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_coxh_118a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+data thi;
+set chf;
+where _imputation_=1;
+run;
+proc freq data=thi;
+tables domain_chf*edlevel;
+run;
+
+
+
+
+
+data nochf;
+set mod3;
+if domain_m3=1 and chf=0 and (smoke_4cat=3 or smoke_4cat=4) then domain_chf=1;
+else if (domain_m3=1 and chf=1) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_chf=0;
+run;
+
+
+proc sort data=nochf;
+by _imputation_;
+run;
+proc surveyphreg data=nochf;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat highbp diab ami ckd cva copd cancer
+bmi_cat /entry=age;
+stratum stratum6;
+cluster psu6;
+weight wtpfex6;
+domain domain_chf;
+by _imputation_;
+ods output parameterestimates=parms119;
+run;
+data parmsclass119;
+set parms119;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass119;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass119;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_coxh_119;
+run;
+data m3_coxh_119a;
+set m3_coxh_119;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_coxh_119a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+data twe;
+set nochf;
+where _imputation_=1;
+run;
+proc freq data=twe;
+tables domain_chf*edlevel;
+run;
+
+
+
+
+data copd;
+set mod3;
+if domain_m3=1 and copd=1 and (smoke_4cat=3 or smoke_4cat=4) then domain_copd=1;
+else if (domain_m3=1 and copd=0) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_copd=0;
+run;
+
+
+proc sort data=copd;
+by _imputation_;
+run;
+proc surveyphreg data=copd;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat highbp diab ami ckd cva chf cancer
+bmi_cat /entry=age;
+stratum stratum6;
+cluster psu6;
+weight wtpfex6;
+domain domain_copd;
+by _imputation_;
+ods output parameterestimates=parms120;
+run;
+data parmsclass120;
+set parms120;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass120;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass120;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_coxh_120;
+run;
+data m3_coxh_120a;
+set m3_coxh_120;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_coxh_120a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+data elw;
+set copd;
+where _imputation_=1;
+run;
+proc freq data=elw;
+tables domain_copd*edlevel;
+run;
+
+
+
+
+
+data nocopd;
+set mod3;
+if domain_m3=1 and copd=0 and (smoke_4cat=3 or smoke_4cat=4) then domain_copd=1;
+else if (domain_m3=1 and copd=1) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_copd=0;
+run;
+
+
+proc sort data=nocopd;
+by _imputation_;
+run;
+proc surveyphreg data=nocopd;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat highbp diab ami ckd cva chf cancer
+bmi_cat /entry=age;
+stratum stratum6;
+cluster psu6;
+weight wtpfex6;
+domain domain_copd;
+by _imputation_;
+ods output parameterestimates=parms121;
+run;
+data parmsclass121;
+set parms121;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass121;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass121;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_coxh_121;
+run;
+data m3_coxh_121a;
+set m3_coxh_121;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_coxh_121a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+data el;
+set nocopd;
+where _imputation_=1;
+run;
+proc freq data=el;
+tables domain_copd*edlevel;
+run;
+
+
+
+data cancer;
+set mod3;
+if domain_m3=1 and cancer=1 and (smoke_4cat=3 or smoke_4cat=4) then domain_cancer=1;
+else if (domain_m3=1 and cancer=0) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_cancer=0;
+run;
+
+
+proc sort data=cancer;
+by _imputation_;
+run;
+proc surveyphreg data=cancer;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat highbp diab ami ckd cva chf copd
+bmi_cat /entry=age;
+stratum stratum6;
+cluster psu6;
+weight wtpfex6;
+domain domain_cancer;
+by _imputation_;
+ods output parameterestimates=parms122;
+run;
+data parmsclass122;
+set parms122;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass122;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass122;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_coxh_122;
+run;
+data m3_coxh_122a;
+set m3_coxh_122;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_coxh_122a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+data ten;
+set cancer;
+where _imputation_=1;
+run;
+proc freq data=ten;
+tables domain_cancer*edlevel;
+run;
+
+
+
+data nocancer;
+set mod3;
+if domain_m3=1 and cancer=0 and (smoke_4cat=3 or smoke_4cat=4) then domain_cancer=1;
+else if (domain_m3=1 and cancer=1) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_cancer=0;
+run;
+
+
+proc sort data=nocancer;
+by _imputation_;
+run;
+proc surveyphreg data=nocancer;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat highbp diab ami ckd cva chf copd
+bmi_cat /entry=age;
+stratum stratum6;
+cluster psu6;
+weight wtpfex6;
+domain domain_cancer;
+by _imputation_;
+ods output parameterestimates=parms123;
+run;
+data parmsclass123;
+set parms123;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass123;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass123;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_coxh_123;
+run;
+data m3_coxh_123a;
+set m3_coxh_123;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_coxh_123a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+data nine;
+set nocancer;
+where _imputation_=1;
+run;
+proc freq data=nine;
+tables domain_cancer*edlevel;
+run;
+
+
+
+
+data diab;
+set mod3;
+if domain_m3=1 and diab=1 and (smoke_4cat=3 or smoke_4cat=4) then domain_diab=1;
+else if (domain_m3=1 and diab=0) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_diab=0;
+run;
+
+
+proc sort data=diab;
+by _imputation_;
+run;
+proc surveyphreg data=diab;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat highbp cancer ami ckd cva chf copd
+bmi_cat /entry=age;
+stratum stratum6;
+cluster psu6;
+weight wtpfex6;
+domain domain_diab;
+by _imputation_;
+ods output parameterestimates=parms124;
+run;
+data parmsclass124;
+set parms124;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass124;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass124;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_coxh_124;
+run;
+data m3_coxh_124a;
+set m3_coxh_124;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_coxh_124a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+data eight;
+set diab;
+where _imputation_=1;
+run;
+proc freq data=eight;
+tables domain_diab*edlevel;
+run;
+
+
+data nodiab;
+set mod3;
+if domain_m3=1 and diab=0 and (smoke_4cat=3 or smoke_4cat=4) then domain_diab=1;
+else if (domain_m3=1 and diab=1) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_diab=0;
+run;
+
+
+proc sort data=nodiab;
+by _imputation_;
+run;
+proc surveyphreg data=nodiab;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat highbp cancer ami ckd cva chf copd
+bmi_cat /entry=age;
+stratum stratum6;
+cluster psu6;
+weight wtpfex6;
+domain domain_diab;
+by _imputation_;
+ods output parameterestimates=parms125;
+run;
+data parmsclass125;
+set parms125;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass125;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass125;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_coxh_125;
+run;
+data m3_coxh_125a;
+set m3_coxh_125;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_coxh_125a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+data seven;
+set nodiab;
+where _imputation_=1;
+run;
+proc freq data=seven;
+tables domain_diab*edlevel;
+run;
+
+
+
+
+
+data drink;
+set mod3;
+if domain_m3=1 and (alcohol_cat=1 or alcohol_cat=2) and (smoke_4cat=3 or smoke_4cat=4)
+then domain_drink=1;
+else if (domain_m3=1 and alcohol_cat=0) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_drink=0;
+run;
+
+
+proc sort data=drink;
+by _imputation_;
+run;
+proc surveyphreg data=drink;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel smoke_4cat diab highbp cancer ami ckd cva chf copd
+bmi_cat /entry=age;
+stratum stratum6;
+cluster psu6;
+weight wtpfex6;
+domain domain_drink;
+by _imputation_;
+ods output parameterestimates=parms128;
+run;
+data parmsclass128;
+set parms128;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass128;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass128;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_coxh_128;
+run;
+data m3_coxh_128a;
+set m3_coxh_128;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_coxh_128a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+data six;
+set drink;
+where _imputation_=1;
+run;
+proc freq data=six;
+tables domain_drink*edlevel;
+run;
+
+
+
+
+
+
+
+data nodrink;
+set mod3;
+if domain_m3=1 and alcohol_cat=0 and (smoke_4cat=3 or smoke_4cat=4) then domain_nodrink=1;
+else if (domain_m3=1 and (alcohol_cat=1 or alcohol_cat=2)) or smoke_4cat=1 or 
+smoke_4cat=2 or domain_m3=0 then domain_nodrink=0;
+run;
+
+
+proc sort data=nodrink;
+by _imputation_;
+run;
+proc surveyphreg data=nodrink;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel smoke_4cat diab highbp cancer ami ckd cva chf copd
+bmi_cat /entry=age;
+stratum stratum6;
+cluster psu6;
+weight wtpfex6;
+domain domain_nodrink;
+by _imputation_;
+ods output parameterestimates=parms129;
+run;
+data parmsclass129;
+set parms129;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass129;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass129;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_coxh_129;
+run;
+data m3_coxh_129a;
+set m3_coxh_129;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_coxh_129a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+data five;
+set nodrink;
+where _imputation_=1;
+run;
+proc freq data=five;
+tables domain_nodrink*edlevel;
+run;
+
+
+
+
+data waist;
+set mod3;
+if domain_m3=1 and waist_cat=1 and (smoke_4cat=3 or smoke_4cat=4)  then domain_waist=1;
+else if (domain_m3=1 and waist=0) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_waist=0;
+run;
+
+
+proc sort data=waist;
+by _imputation_;
+run;
+proc surveyphreg data=waist;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel smoke_4cat alcohol_cat diab highbp cancer ami ckd cva chf copd
+/entry=age;
+stratum stratum6;
+cluster psu6;
+weight wtpfex6;
+domain domain_waist;
+by _imputation_;
+ods output parameterestimates=parms130;
+run;
+data parmsclass130;
+set parms130;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass130;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass130;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_coxh_130;
+run;
+data m3_coxh_130a;
+set m3_coxh_130;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_coxh_130a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+data four;
+set waist;
+where _imputation_=1;
+run;
+proc freq data=four;
+tables domain_waist*edlevel;
+run;
+
+
+data nowaist;
+set mod3;
+if domain_m3=1 and waist_cat=0 and (smoke_4cat=3 or smoke_4cat=4) then domain_nowaist=1;
+else if (domain_m3=1 and waist_cat=1) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_nowaist=0;
+run;
+
+
+proc sort data=nowaist;
+by _imputation_;
+run;
+proc surveyphreg data=nowaist;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel smoke_4cat alcohol_cat diab highbp cancer ami ckd cva chf copd
+/entry=age;
+stratum stratum6;
+cluster psu6;
+weight wtpfex6;
+domain domain_nowaist;
+by _imputation_;
+ods output parameterestimates=parms131;
+run;
+data parmsclass131;
+set parms131;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass131;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass131;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_coxh_131;
+run;
+data m3_coxh_131a;
+set m3_coxh_131;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_coxh_131a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+data three;
+set nowaist;
+where _imputation_=1;
+run;
+proc freq data=three;
+tables domain_nowaist*edlevel;
+run;
+
+
+
+
+
+
+data who;
+set mod3;
+if domain_m3=1 and bmi_cat=4 and (smoke_4cat=3 or smoke_4cat=4) then domain_who=1;
+else if (domain_m3=1 and (bmi_cat=1 or bmi_cat=2 or bmi_cat=3)) or smoke_4cat=1
+or smoke_4cat=2 or domain_m3=0 then domain_who=0;
+run;
+
+
+proc sort data=who;
+by _imputation_;
+run;
+proc surveyphreg data=who;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel smoke_4cat alcohol_cat diab highbp cancer ami ckd cva chf copd
+/entry=age;
+stratum stratum6;
+cluster psu6;
+weight wtpfex6;
+domain domain_who;
+by _imputation_;
+ods output parameterestimates=parms132;
+run;
+data parmsclass132;
+set parms132;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass132;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass132;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_coxh_132;
+run;
+data m3_coxh_132a;
+set m3_coxh_132;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_coxh_132a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+data two;
+set who;
+where _imputation_=1;
+run;
+proc freq data=two;
+tables domain_who*edlevel;
+run;
+
+
+
+
+data nowho;
+set mod3;
+if domain_m3=1 and (bmi_cat=1 or bmi_cat=2 or bmi_cat=3) and 
+(smoke_4cat=3 or smoke_4cat=4) then domain_nowho=1;
+else if (domain_m3=1 and bmi_cat=4) or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_nowho=0;
+run;
+
+
+proc sort data=nowho;
+by _imputation_;
+run;
+proc surveyphreg data=nowho;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel smoke_4cat alcohol_cat diab highbp cancer ami ckd cva chf copd
+/entry=age;
+stratum stratum6;
+cluster psu6;
+weight wtpfex6;
+domain domain_nowho;
+by _imputation_;
+ods output parameterestimates=parms133;
+run;
+data parmsclass133;
+set parms133;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass133;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass133;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_coxh_133;
+run;
+data m3_coxh_133a;
+set m3_coxh_133;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_coxh_133a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+proc freq data=nowho;
+tables domain_nowho;
+run;
+
+data one;
+set nowho;
+if _imputation_=1;
+run;
+proc freq data=one;
+tables domain_nowho*edlevel;
+run;
+
+
+
+
+/* HTN subsets */
+
+/* Diabetes */
+
+data mod0912;
+set mike.nhanes0912_domain2_multimp_m3;
+agedur=age+(dur2/12);
+run;
+
+
+data htndm;
+set mod0912;
+if domain_m3=1 and highbp=1 and diab=1 and (smoke_4cat=3 or smoke_4cat=4) 
+then domain_bp=1;
+else if (domain_m3=1 and highbp=0) or (domain_m3=1 and highbp=1 and diab=0) 
+or (domain_m3=1 and smoke_4cat=1) or (domain_m3=1
+and smoke_4cat=2) or domain_m3=0 then domain_bp=0;
+run;
+
+
+proc sort data=htndm;
+by _imputation_;
+run;
+proc surveyphreg data=htndm;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat ami cva chf ckd copd cancer
+bmi_cat /entry=age;
+stratum stratum;
+cluster psu;
+weight weight4y;
+domain domain_bp;
+by _imputation_;
+ods output parameterestimates=parms111;
+run;
+data parmsclass111;
+set parms111;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass111;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass111;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_cox_111;
+run;
+data m3_cox_111a;
+set m3_cox_111;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_cox_111a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+data w306;
+set htndm;
+where _imputation_=1;
+run;
+proc freq data=w306;
+tables domain_bp*edlevel;
+run;
+
+
+
+
+
+
+
+data htn_nodm;
+set mod0912;
+if domain_m3=1 and highbp=1 and diab=0 and (smoke_4cat=3 or smoke_4cat=4) 
+then domain_bp=1;
+else if (domain_m3=1 and highbp=0) or (domain_m3=1 and highbp=1 and diab=1) 
+or (domain_m3=1 and smoke_4cat=1) or (domain_m3=1
+and smoke_4cat=2) or domain_m3=0 then domain_bp=0;
+run;
+
+
+proc sort data=htn_nodm;
+by _imputation_;
+run;
+proc surveyphreg data=htn_nodm;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat ami cva chf ckd copd cancer
+bmi_cat /entry=age;
+stratum stratum;
+cluster psu;
+weight weight4y;
+domain domain_bp;
+by _imputation_;
+ods output parameterestimates=parms111;
+run;
+data parmsclass111;
+set parms111;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass111;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass111;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_cox_111;
+run;
+data m3_cox_111a;
+set m3_cox_111;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_cox_111a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+data w305;
+set htn_nodm;
+where _imputation_=1;
+run;
+proc freq data=w305;
+tables domain_bp*edlevel;
+run;
+
+
+
+
+
+
+
+
+
+data htndm3;
+set mod3;
+if domain_m3=1 and highbp=1 and diab=1 and (smoke_4cat=3 or smoke_4cat=4) 
+then domain_bp=1;
+else if (domain_m3=1 and highbp=0) or (domain_m3=1 and highbp=1 and diab=0) 
+or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_bp=0;
+run;
+
+
+proc sort data=htndm3;
+by _imputation_;
+run;
+proc surveyphreg data=htndm3;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat ami cva chf ckd copd cancer
+bmi_cat /entry=age;
+stratum stratum6;
+cluster psu6;
+weight wtpfex6;
+domain domain_bp;
+by _imputation_;
+ods output parameterestimates=parms111;
+run;
+data parmsclass111;
+set parms111;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass111;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass111;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_coxh_111;
+run;
+data m3_coxh_111a;
+set m3_coxh_111;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_coxh_111a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+data w304;
+set htndm3;
+where _imputation_=1;
+run;
+proc freq data=w304;
+tables domain_bp*edlevel;
+run;
+
+
+
+
+
+data htn_nodm3;
+set mod3;
+if domain_m3=1 and highbp=1 and diab=0 and (smoke_4cat=3 or smoke_4cat=4) 
+then domain_bp=1;
+else if (domain_m3=1 and highbp=0) or (domain_m3=1 and highbp=1 and diab=1) 
+or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_bp=0;
+run;
+
+
+proc sort data=htn_nodm3;
+by _imputation_;
+run;
+proc surveyphreg data=htn_nodm3;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel alcohol_cat smoke_4cat ami cva chf ckd copd cancer
+bmi_cat /entry=age;
+stratum stratum6;
+cluster psu6;
+weight wtpfex6;
+domain domain_bp;
+by _imputation_;
+ods output parameterestimates=parms111;
+run;
+data parmsclass111;
+set parms111;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass111;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass111;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_coxh_111;
+run;
+data m3_coxh_111a;
+set m3_coxh_111;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_coxh_111a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+data w303;
+set htn_nodm3;
+where _imputation_=1;
+run;
+proc freq data=w303;
+tables domain_bp*edlevel;
+run;
+
+
+
+
+
+
+/* Drinking */
+
+
+data mod0912;
+set mike.nhanes0912_domain2_multimp_m3;
+agedur=age+(dur2/12);
+run;
+
+
+data htndrink;
+set mod0912;
+if domain_m3=1 and highbp=1 and (alcohol_cat=1 or alcohol_cat=2) and (smoke_4cat=3 or smoke_4cat=4) 
+then domain_bp=1;
+else if (domain_m3=1 and highbp=0) or (domain_m3=1 and highbp=1 and alcohol_cat=0) 
+or (domain_m3=1 and smoke_4cat=1) or (domain_m3=1
+and smoke_4cat=2) or domain_m3=0 then domain_bp=0;
+run;
+
+
+proc sort data=htndrink;
+by _imputation_;
+run;
+proc surveyphreg data=htndrink;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel diab smoke_4cat ami cva chf ckd copd cancer
+bmi_cat /entry=age;
+stratum stratum;
+cluster psu;
+weight weight4y;
+domain domain_bp;
+by _imputation_;
+ods output parameterestimates=parms111;
+run;
+data parmsclass111;
+set parms111;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass111;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass111;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_cox_119;
+run;
+data m3_cox_119a;
+set m3_cox_119;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_cox_119a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+data w303;
+set htndrink;
+where _imputation_=1;
+run;
+proc freq data=w303;
+tables domain_bp*edlevel;
+run;
+
+
+
+
+
+
+
+
+data htn_nodrink;
+set mod0912;
+if domain_m3=1 and highbp=1 and alcohol_cat=0 and (smoke_4cat=3 or smoke_4cat=4) 
+then domain_bp=1;
+else if (domain_m3=1 and highbp=0) or (domain_m3=1 and highbp=1 and alcohol_cat=1)
+or (domain_m3=1 and highbp=1 and alcohol_cat=2)  
+or (domain_m3=1 and smoke_4cat=1) or (domain_m3=1 and smoke_4cat=2) or domain_m3=0 then domain_bp=0;
+run;
+
+
+proc sort data=htn_nodrink;
+by _imputation_;
+run;
+proc surveyphreg data=htn_nodrink;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel diab smoke_4cat ami cva chf ckd copd cancer
+bmi_cat /entry=age;
+stratum stratum;
+cluster psu;
+weight weight4y;
+domain domain_bp;
+by _imputation_;
+ods output parameterestimates=parms111;
+run;
+data parmsclass111;
+set parms111;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass111;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass111;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_cox_115;
+run;
+data m3_cox_115a;
+set m3_cox_115;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_cox_115a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+
+
+data w302;
+set htn_nodrink;
+where _imputation_=1;
+run;
+proc freq data=w302;
+tables domain_bp*edlevel;
+run;
+
+
+
+
+
+
+
+
+data htndrink3;
+set mod3;
+if domain_m3=1 and highbp=1 and (alcohol_cat=1 or alcohol_cat=2) and
+(smoke_4cat=3 or smoke_4cat=4) then domain_bp=1;
+else if (domain_m3=1 and highbp=0) or (domain_m3=1 and highbp=1 and alcohol_cat=0) 
+or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_bp=0;
+run;
+
+
+proc sort data=htndrink3;
+by _imputation_;
+run;
+proc surveyphreg data=htndrink3;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel diab smoke_4cat ami cva chf ckd copd cancer
+bmi_cat /entry=age;
+stratum stratum6;
+cluster psu6;
+weight wtpfex6;
+domain domain_bp;
+by _imputation_;
+ods output parameterestimates=parms111;
+run;
+data parmsclass111;
+set parms111;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass111;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass111;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_coxh_116;
+run;
+data m3_coxh_116a;
+set m3_coxh_116;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_coxh_116a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+data w301;
+set htndrink3;
+where _imputation_=1;
+run;
+proc freq data=w301;
+tables domain_bp*edlevel;
+run;
+
+
+
+
+
+data htn_nodrink3;
+set mod3;
+if domain_m3=1 and highbp=1 and alcohol_cat=0 and (smoke_4cat=3 or smoke_4cat=4) 
+then domain_bp=1;
+else if (domain_m3=1 and highbp=0) or (domain_m3=1 and highbp=1 and alcohol_cat=1)
+or (domain_m3=1 and highbp=1 and alcohol_cat=2)  
+or smoke_4cat=1 or smoke_4cat=2 or domain_m3=0 then domain_bp=0;
+run;
+
+
+proc sort data=htn_nodrink3;
+by _imputation_;
+run;
+proc surveyphreg data=htn_nodrink3;
+class edlevel(param=ref ref='3') race(param=ref ref='1') married(param=ref ref='1')  
+smoke_4cat(param=ref ref='4') alcohol_cat(param=ref ref='1') bmi_cat(param=ref ref='2') 
+chf(param=ref ref='0') cva(param=ref ref='0') copd(param=ref ref='0') ckd(param=ref ref='0')
+cancer(param=ref ref='0') diab(param=ref ref='0') highbp(param=ref ref='0')
+ami(param=ref ref='0') agecat(param=ref ref='1');
+model agedur*dead(0)=agecat race married edlevel diab smoke_4cat ami cva chf ckd copd cancer
+bmi_cat /entry=age;
+stratum stratum6;
+cluster psu6;
+weight wtpfex6;
+domain domain_bp;
+by _imputation_;
+ods output parameterestimates=parms111;
+run;
+data parmsclass111;
+set parms111;
+if scan(parameter,1)='edlevel' then do;
+effect='edlevel';
+edlevel=scan(parameter,2,' ');
+end;
+run;
+proc sort data=parmsclass111;
+by domain;
+run;
+proc mianalyze parms(classvar=full)=parmsclass111;
+class edlevel;
+modeleffects edlevel; 
+by domain;
+ods output parameterestimates=m3_coxh_118;
+run;
+data m3_coxh_118a;
+set m3_coxh_118;
+hr=exp(estimate);
+lcl=exp(lclmean);
+ucl=exp(uclmean);
+run;
+proc print data=m3_coxh_118a;
+var parm domain edlevel hr lcl ucl;
+run;
+
+
+
+data w300;
+set htn_nodrink3;
+where _imputation_=1;
+run;
+proc freq data=w300;
+tables domain_bp*edlevel;
+run;
+
