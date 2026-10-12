@@ -25,4 +25,4 @@ SAS Program files and work flow
 3.  descriptive_raw_imputed.txt
 4.  agebyedlevel_m60_freq.txt and agebyedlevel_f60_freq.txt		(2 files) provide disease frequencies in NHANES 2009-2012 in men and women, for use as sampling frequencies in NHANES III
 5.  Dasgupta_rev.  R code for decompositions.
-6.  m3_f3_hr_interactions_n0912.  SAS code for effect modification.
+6.  m3_f3_hr_interactions_n0912_Oct.  SAS code for effect modification.
